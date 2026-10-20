@@ -1,0 +1,9 @@
+export type Club = {id:number;name:string;short_name:string;strength:number;strength_attack_home:number;strength_attack_away:number;strength_defence_home:number;strength_defence_away:number;code:number};
+export type Player = {id:number;web_name:string;first_name:string;second_name:string;team:number;element_type:number;now_cost:number;selected_by_percent:string;total_points:number;event_points:number;form:string;points_per_game:string;minutes:number;goals_scored:number;assists:number;clean_sheets:number;bonus:number;bps:number;status:string;news:string;chance_of_playing_next_round:number|null;expected_goals?:string;expected_assists?:string;expected_goals_conceded?:string;transfers_in_event:number;transfers_out_event:number};
+export type Gameweek = {id:number;name:string;deadline_time:string;finished:boolean;is_current:boolean;is_next:boolean};
+export type Fixture = {id:number;event:number|null;team_h:number;team_a:number;team_h_score:number|null;team_a_score:number|null;finished:boolean;kickoff_time:string|null;team_h_difficulty:number;team_a_difficulty:number};
+export type Bootstrap = {elements:Player[];teams:Club[];events:Gameweek[];element_types:{id:number;singular_name_short:string}[];total_players:number};
+export type Pick = {element:number;position:number;multiplier:number;is_captain:boolean;is_vice_captain:boolean;selling_price?:number};
+export type Entry = {id:number;name:string;player_first_name:string;player_last_name:string;summary_overall_points:number;summary_overall_rank:number|null;last_deadline_value:number|null;last_deadline_bank:number|null;current_event:number|null};
+export type PicksResponse = {picks:Pick[];entry_history?:{event:number;points:number;total_points:number;rank:number;bank:number;value:number;event_transfers:number;event_transfers_cost:number};active_chip?:string|null};
+export type NewsArticle = {title:string;url:string;source:string;published:string;description:string;teams:string[];playerIds:number[]};

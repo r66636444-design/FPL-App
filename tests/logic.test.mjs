@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { availability, fixtureWindow, optimalXI, playerProjection, transferCandidates, validSquad, clubForm } from '../lib/fpl.ts';
+const club = (id)=>({id,name:`Team ${id}`,short_name:`T${id}`,strength:1100,strength_defence_home:1100,strength_defence_away:1100});
+const clubs = Array.from({length:10},(_,i)=>club(i+1));
+const player = (id,position,team)=>({id,element_type:position,team,web_name:`P${id}`,minutes:630,points_per_game:'5',form:'5',chance_of_playing_next_round:null,status:'a',now_cost:50});
+const fixture = (event, h=1, a=2,dh=3,da=3)=>({id:event*10+h,event,team_h:h,team_a:a,finished:false,team_h_score:null,team_a_score:null,team_h_difficulty:dh,team_a_difficulty:da,kickoff_time:null});
+const squad=[...Array.from({length:2},(_,i)=>player(i+1,1,i+1)),...Array.from({length:5},(_,i)=>player(i+3,2,3+(i%3))),...Array.from({length:5},(_,i)=>player(i+8,3,6+(i%3))),...Array.from({length:3},(_,i)=>player(i+13,4,1+i))];
+
+test('valid squad enforces 15 unique players, positions and max three per club',()=>{assert.equal(validSquad(squad),true);assert.equal(validSquad([...squad.slice(0,14),squad[0]]),false);assert.equal(validSquad(squad.slice(0,14)),false);assert.equal(validSquad(squad.map((p,i)=>i<4?{...p,team:1}:p)),false)});
+test('projections count all double gameweek fixtures and no blank fixtures',()=>{const p=player(1,3,1);const f=[fixture(8,1,2),fixture(8,1,3),fixture(10,1,4)];assert.equal(playerProjection(p,f,clubs,8,1).fixtureCount,2);assert.equal(playerProjection(p,f,clubs,9,1).points,0);assert.equal(playerProjection(p,f,clubs,8,3).fixtureCount,3)});
+test('injured players have lower projections and range surrounds estimate',()=>{const p=player(1,3,1);const fs=[fixture(8)];const healthy=playerProjection(p,fs,clubs,8,1);const injured=playerProjection({...p,chance_of_playing_next_round:25},fs,clubs,8,1);assert.ok(injured.points<healthy.points);assert.ok(healthy.low<=healthy.points&&healthy.high>=healthy.points);assert.equal(availability({...p,status:'i'}),.18)});
+test('legal XI optimizer always uses one keeper, at least three defenders and 11 players',()=>{const result=optimalXI(squad,[fixture(8,1,2)],clubs,8);assert.ok(result);assert.equal(result.starters.length,11);assert.equal(result.starters.filter(p=>p.element_type===1).length,1);assert.ok(result.starters.filter(p=>p.element_type===2).length>=3);assert.equal(result.bench.length,4);assert.ok(result.captain&&result.vice)});
+test('transfer recommendations enforce position budget and club limits',()=>{const outgoing=squad[2];const replacements=[player(99,2,9),player(100,3,9),{...player(101,2,10),now_cost:70}];const results=transferCandidates(outgoing,squad,replacements,[fixture(8,9,1)],clubs,8,0);assert.deepEqual(results.map(p=>p.id),[99])});
+test('finished matches without scores are not mistakenly included in form',()=>{const incomplete={...fixture(7),finished:true};const stats=clubForm(club(1),[incomplete]);assert.equal(stats.played,0)});

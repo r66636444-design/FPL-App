@@ -1,0 +1,3 @@
+import {NextResponse} from 'next/server';import {bootstrap,fixtures,gameweek,rankClubs} from '@/lib/fpl';
+export const dynamic='force-dynamic';
+export async function GET(){try{const [data,matches]=await Promise.all([bootstrap(),fixtures()]);return NextResponse.json({data,fixtures:matches,gameweek:gameweek(data),ranking:rankClubs(data.teams,matches),updatedAt:new Date().toISOString()},{headers:{'Cache-Control':'public, max-age=120, stale-while-revalidate=300'}});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Live FPL service unavailable'},{status:503});}}

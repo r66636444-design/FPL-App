@@ -1,0 +1,2 @@
+import type { Config } from 'tailwindcss';
+export default {content:['./app/**/*.{ts,tsx}','./components/**/*.{ts,tsx}'],theme:{extend:{colors:{canvas:'#0b100f',panel:'#121b18',soft:'#1a2520',accent:'#c5fa67',muted:'#95a49a'}}},plugins:[]} satisfies Config;

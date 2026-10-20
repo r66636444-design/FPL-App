@@ -1,0 +1,2 @@
+import {NextRequest,NextResponse} from 'next/server';import {bootstrap} from '@/lib/fpl';import {getNews} from '@/lib/news';
+export async function GET(request:NextRequest){try{const d=await bootstrap();return NextResponse.json({articles:await getNews(d.elements,d.teams,request.nextUrl.searchParams.get('refresh')==='1'),updatedAt:new Date().toISOString()});}catch{return NextResponse.json({articles:[],error:'News sources temporarily unavailable'},{status:503});}}

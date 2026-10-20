@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FootballNews {
+  url         String   @id
+  title       String
+  source      String
+  publishedAt DateTime
+  description String   @db.Text
+  teams       String[]
+  playerIds   Int[]
+  refreshedAt DateTime @updatedAt
+
+  @@index([publishedAt(sort: Desc)])
+}
+
+model IngestionRun {
+  id        String   @id @default(cuid())
+  provider  String
+  count     Int
+  startedAt DateTime @default(now())
+  finishedAt DateTime?
+  error     String?  @db.Text
+
+  @@index([startedAt(sort: Desc)])
+}
