@@ -1,0 +1,25 @@
+name: Verify FPL Intelligence
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run domain tests
+        run: npm test
+      - name: Type-check project
+        run: npm run typecheck
+      - name: Build production app
+        run: npm run build
